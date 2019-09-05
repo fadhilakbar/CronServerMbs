@@ -374,24 +374,28 @@ func SendMessageWA(Hp string, Pesan string, Id int) int {
 		Send(b).
 		End()
 	fmt.Println(resp.Body)
-	if resp.StatusCode == http.StatusOK {
-		stmt, err := conn.Prepare("UPDATE outbox SET STATUS=1 where chat_id=?")
-		if err != nil {
-			functions.Logger().Error(err.Error())
-			return 0
-		}
-		defer stmt.Close()
-		_, err = stmt.Exec(Id)
-		if err != nil {
-			functions.Logger().Error(err.Error())
-			return 0
-		} else {
-			functions.Logger().Info("Successfully UpdateStatus")
-			return 1
-		}
+	if resp != nil {
+		if resp.StatusCode == http.StatusOK {
+			stmt, err := conn.Prepare("UPDATE outbox SET STATUS=1 where chat_id=?")
+			if err != nil {
+				functions.Logger().Error(err.Error())
+				return 0
+			}
+			defer stmt.Close()
+			_, err = stmt.Exec(Id)
+			if err != nil {
+				functions.Logger().Error(err.Error())
+				return 0
+			} else {
+				functions.Logger().Info("Successfully UpdateStatus")
+			}
 
-		functions.Logger().Info("Successfully Send Message to WABLAS")
-		return 1
+			functions.Logger().Info("Successfully Send Message to WABLAS")
+			return 1
+		} else {
+			functions.Logger().Error("An Error Occured")
+			return 0
+		}
 	} else {
 		functions.Logger().Error("An Error Occured")
 		return 0
